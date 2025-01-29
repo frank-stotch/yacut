@@ -6,7 +6,7 @@ from werkzeug.exceptions import BadRequest
 
 from . import app
 from .forms import URLMapForm
-from .models import MaxLength, URLMap
+from .models import URLMap
 
 
 POSSIBLE_CHARACTERS = ascii_letters + digits
@@ -14,6 +14,7 @@ SHORT_ID_READY = ('Ваша короткая ссылка готова: '
                   '<a href="{short}">{short}</a>')
 SHORT_ALREADY_EXISTS = ('Вариант короткой ссылки '
                         '<a href="{short}">{short}</a> уже существует')
+RANDOM_SHORT_ID_LENGTH = 6
 
 
 def get_unique_short_id():
@@ -22,7 +23,7 @@ def get_unique_short_id():
     """
     while True:
         short_id = ''.join(choices(POSSIBLE_CHARACTERS,
-                           k=MaxLength.RANDOM_SHORT_ID))
+                           k=RANDOM_SHORT_ID_LENGTH))
         if not URLMap.exists(short=short_id):
             return short_id
 
