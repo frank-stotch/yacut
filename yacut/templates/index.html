@@ -24,6 +24,11 @@
           {% endif %}
           {{ form.custom_id(class="form-control form-control-lg py-2 mb-3", id="form-link",
           placeholder=form.custom_id.label.text) }}
+          {% if form.custom_id.errors %}
+            {% for error in form.custom_id.errors %}
+              <p><span style="color:red"></span>{{ error }}</p>
+            {% endfor %}
+          {% endif %}
           {% with messages = get_flashed_messages(category_filter=["custom-id-error"]) %}
             {% if messages %}
               {% for message in messages %}
