@@ -15,20 +15,22 @@
       <div class="col-sm">
         <form method="POST" novalidate>
           {{ form.csrf_token }}
-          {{ form.original_link(class="form-control form-control-lg py-2 mb-3" id="form-title" name=""
-          placeholder=form.original_link.label.text) }}<br />
+          {{ form.original_link(class="form-control form-control-lg py-2 mb-3", id="form-title",
+          placeholder=form.original_link.label.text) }}
           {% if form.original_link.errors %}
-          {% for error in form.original_link.errors %}
-          <p><span style="color:red"></span>{{ error }}</p>
-          {% endfor %}
+            {% for error in form.original_link.errors %}
+              <p><span style="color:red"></span>{{ error }}</p>
+            {% endfor %}
           {% endif %}
-          {{ form.custom_id(class="form-control form-control-lg py-2 mb-3" id="form-link" name=""
-          placeholder=form.custom_id.label.text) }}<br />
-          {% if form.custom_id.errors %}
-          {% for error in form.custom_id.errors %}
-          <p><span style="color:red"></span>{{ error }}</p>
-          {% endfor %}
-          {% endif %}
+          {{ form.custom_id(class="form-control form-control-lg py-2 mb-3", id="form-link",
+          placeholder=form.custom_id.label.text) }}
+          {% with messages = get_flashed_messages(category_filter=["custom-id-error"]) %}
+            {% if messages %}
+              {% for message in messages %}
+                <p><span style="color:red"></span>{{ message|safe }}</p>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
           {{ form.submit(class="btn btn-primary") }}
         </form>
 
@@ -38,7 +40,7 @@
     </div>
   </div>
 
-  {% with messages = get_flashed_messages() %}
+  {% with messages = get_flashed_messages(category_filter=["success"]) %}
   {% if messages %}
   {% for message in messages %}
   <div class="container">
@@ -47,7 +49,7 @@
       </div>
       <div class="col-sm">
         <p class="text-center">
-        <h5 class="text-center">{{ message }}</h5>
+        <h5 class="text-center">{{ message|safe }}</h5>
         </p>
       </div>
       <div class="col-sm">
