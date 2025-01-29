@@ -26,7 +26,7 @@ class InvalidAPIUsage(Exception):
 def invalid_form_data(error):
     db.session.rollback()
     form = URLMapForm()
-    flash(error.description)
+    flash(error.description, 'custom-id-error')
     return render_template('index.html', form=form), error.code
 
 
