@@ -22,6 +22,11 @@ class InvalidAPIUsage(Exception):
         return dict(message=self.message)
 
 
+@app.errorhandler(InvalidAPIUsage)
+def invalid_api_usage(error):
+    return jsonify(error.to_dict()), error.status_code
+
+
 @app.errorhandler(BadRequest)
 def invalid_form_data(error):
     db.session.rollback()
