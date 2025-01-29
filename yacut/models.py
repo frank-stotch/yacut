@@ -3,7 +3,6 @@ from datetime import datetime, timezone
 from urllib.parse import urlparse
 
 from sqlalchemy import exists
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import validates
 
 from . import db
@@ -13,7 +12,6 @@ from .settings import SHORT_ID_PATTERN
 class MaxLength:
     ORIGINAL_URL = 256
     SHORT_ID = 64
-    RANDOM_SHORT_ID = 6
 
 
 class MinLength:
