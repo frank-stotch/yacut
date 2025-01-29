@@ -12,6 +12,8 @@ from .models import Message, MaxLength, URLMap
 POSSIBLE_CHARACTERS = ascii_letters + digits
 SHORT_ID_READY = ('Ваша короткая ссылка готова: '
                   '<a href="{short}">{short}</a>')
+SHORT_ALREADY_EXISTS = ('Вариант короткой ссылки '
+                        '<a href="{short}">{short}</a> уже существует')
 
 
 def get_unique_short_id():
@@ -25,26 +27,14 @@ def get_unique_short_id():
             return short_id
 
 
-def create_or_get_short_url(original, custom_short_id=None):
-    """
-    Если пользователь передал  custom_short_id, то проверяет наличие в БД.
-    При его наличии в БД, бросает исключение. Если custom_short_id новый,
-    то возвращает это его и True (можно создать запись в БД).
-
-    Если свой short_id не передан, то проверяет наличие original ссылки в БД.
-    Если она есть, то возвращает имеющийся short
-    и False (создать запись нельзя). В противном случае генерирует
-    custom_short_id, возвращает его и True (можно создать запись в БД)
-    """
+def get_unique_short_id_or_400(custom_short_id=None):
     if custom_short_id:
         if URLMap.exists(short=custom_short_id):
-            raise BadRequest(
-                Message.SHORT_ALREADY_EXISTS.format(custom_short_id))
-        return custom_short_id, True
-    existing_entry = URLMap.query.filter_by(original=original).first()
-    if existing_entry:
-        return existing_entry.short, False
-    return get_unique_short_id(), True
+            short_url = url_for(
+                'redirect_view', short_id=custom_short_id, _external=True)
+            raise BadRequest(SHORT_ALREADY_EXISTS.format(short=short_url))
+        return custom_short_id
+    return get_unique_short_id()
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -52,13 +42,11 @@ def index_view():
     form = URLMapForm()
     if form.validate_on_submit():
         original = form.original_link.data
-        short_id, can_create = create_or_get_short_url(
-            original, form.custom_id.data)
-        if can_create:
-            entry = URLMap(original=original, short=short_id)
-            entry.save()
+        short_id = get_unique_short_id_or_400(form.custom_id.data)
+        entry = URLMap(original=original, short=short_id)
+        entry.save()
         short_url = url_for('redirect_view', short_id=short_id, _external=True)
-        flash(SHORT_ID_READY.format(short_url))
+        flash(SHORT_ID_READY.format(short=short_url), 'success')
     return render_template('index.html', form=form)
 
 
