@@ -2,6 +2,8 @@ import re
 from datetime import datetime, timezone
 from urllib.parse import urlparse
 
+from sqlalchemy import exists
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import validates
 
 from . import db
@@ -20,6 +22,7 @@ class MinLength:
 
 
 class Message:
+    SHORT_ALREADY_EXISTS = 'Вариант короткой ссылки "{}" уже существует'
     REQUIRED_FIELD = 'Обязательное поле'
     INVALID_URL_PATTERN = 'Неправильный формат ссылки'
     INVALID_SHORT_ID_PATTERN = ('Можно использовать только'
@@ -27,6 +30,8 @@ class Message:
     INVALID_SHORT_ID_LENGTH = ('Длина короткой ссылки '
                                f'от {MinLength.SHORT_ID} '
                                f'до {MaxLength.SHORT_ID}')
+    FILTERS_REQUIRED = 'Нужно передать хотя бы один фильтр'
+    INVALID_FILTERS = 'Некорректные поля {}'
 
 
 class URLMap(db.Model):
@@ -70,6 +75,26 @@ class URLMap(db.Model):
         for field in self.get_required_fields_names():
             if field in data:
                 setattr(self, field, data[field])
+
+    @classmethod
+    def __check_filters(cls, **filters):
+        if not filters:
+            raise ValueError(Message.FILTERS_REQUIRED)
+        invalid_keys = set(filters) - set(cls.get_all_fields_names())
+        if invalid_keys:
+            raise ValueError(Message.INVALID_FILTERS.format(invalid_keys))
+
+    @classmethod
+    def exists(cls, **filters):
+        cls.__check_filters(**filters)
+        return bool(
+            db.session.query(
+                exists().where(
+                    *[getattr(cls, key) == value
+                      for key, value in filters.items()]
+                )
+            ).scalar()
+        )
 
     @validates('original')
     def validate_original(self, key, original: str):
