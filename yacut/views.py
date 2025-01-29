@@ -6,7 +6,7 @@ from werkzeug.exceptions import BadRequest
 
 from . import app
 from .forms import URLMapForm
-from .models import Message, MaxLength, URLMap
+from .models import MaxLength, URLMap
 
 
 POSSIBLE_CHARACTERS = ascii_letters + digits
