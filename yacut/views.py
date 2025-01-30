@@ -1,5 +1,4 @@
 from random import choices
-from string import ascii_letters, digits
 
 from flask import flash, redirect, render_template, url_for
 from werkzeug.exceptions import BadRequest
@@ -7,13 +6,12 @@ from werkzeug.exceptions import BadRequest
 from . import app
 from .forms import URLMapForm
 from .models import URLMap
+from .settings import POSSIBLE_CHARACTERS, RANDOM_SHORT_ID_LENGTH
 
 
-POSSIBLE_CHARACTERS = ascii_letters + digits
 SHORT_ID_READY = ('Ваша короткая ссылка готова: '
                   '<a href="{short}">{short}</a>')
 SHORT_ALREADY_EXISTS = 'Предложенный вариант короткой ссылки уже существует.'
-RANDOM_SHORT_ID_LENGTH = 6
 
 
 def get_unique_short_id():

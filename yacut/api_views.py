@@ -1,5 +1,5 @@
-import re
 from http import HTTPStatus
+import re
 from urllib.parse import urlparse
 
 from flask import jsonify, request, url_for
