@@ -7,8 +7,8 @@ from flask import jsonify, request, url_for
 from . import app
 from .error_handlers import InvalidAPIUsage
 from .models import URLMap
-from .views import get_unique_short_id
 from .settings import SHORT_ID_LENGTH, SHORT_ID_PATTERN
+from .views import get_unique_short_id
 
 
 ENTRY_DOES_NOT_EXIST = 'Указанный id не найден'
