@@ -1,8 +1,8 @@
 """added urlmap model
 
-Revision ID: daedb2bfcbf5
+Revision ID: 292035687094
 Revises: 
-Create Date: 2025-01-30 02:20:48.172448
+Create Date: 2025-01-30 05:29:08.563438
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'daedb2bfcbf5'
+revision = '292035687094'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,7 +21,7 @@ def upgrade():
     op.create_table('url_map',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('original', sa.String(length=256), nullable=False),
-    sa.Column('short', sa.String(length=64), nullable=False),
+    sa.Column('short', sa.String(length=16), nullable=False),
     sa.Column('timestamp', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('short')
