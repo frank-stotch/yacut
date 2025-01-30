@@ -1,7 +1,6 @@
 from http import HTTPStatus
 
 from flask import flash, jsonify, render_template
-from werkzeug.exceptions import BadRequest
 
 from . import app, db
 from .forms import URLMapForm
@@ -25,14 +24,6 @@ class InvalidAPIUsage(Exception):
 @app.errorhandler(InvalidAPIUsage)
 def invalid_api_usage(error):
     return jsonify(error.to_dict()), error.status_code
-
-
-@app.errorhandler(BadRequest)
-def invalid_form_data(error):
-    db.session.rollback()
-    form = URLMapForm()
-    flash(error.description, 'custom-id-error')
-    return render_template('index.html', form=form), error.code
 
 
 @app.errorhandler(HTTPStatus.INTERNAL_SERVER_ERROR)
