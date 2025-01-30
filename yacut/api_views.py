@@ -6,9 +6,9 @@ from flask import jsonify, request, url_for
 
 from . import app
 from .error_handlers import InvalidAPIUsage
-from .models import MaxLength, URLMap
+from .models import URLMap
 from .views import get_unique_short_id
-from .settings import SHORT_ID_PATTERN
+from .settings import SHORT_ID_LENGTH, SHORT_ID_PATTERN
 
 
 ENTRY_DOES_NOT_EXIST = 'Указанный id не найден'
@@ -26,13 +26,7 @@ def get_url(short_id):
     entry = URLMap.query.filter_by(short=short_id).first()
     if not entry:
         raise InvalidAPIUsage(ENTRY_DOES_NOT_EXIST, HTTPStatus.NOT_FOUND)
-    return (
-        jsonify(
-            {'url':
-             url_for('redirect_view', short_id=entry.short, _external=True)}
-        ),
-        HTTPStatus.OK
-    )
+    return jsonify({'url': entry.original}), HTTPStatus.OK
 
 
 def get_original(original_field_name: str, data: dict):
@@ -51,7 +45,7 @@ def get_short(short_field_name: str, data: dict):
     if not short:
         return get_unique_short_id()
     if (
-        len(short) > MaxLength.SHORT_ID
+        len(short) > SHORT_ID_LENGTH
         or not re.fullmatch(SHORT_ID_PATTERN, short)
     ):
         raise InvalidAPIUsage(INVALID_SHORT)

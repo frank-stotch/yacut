@@ -6,12 +6,11 @@ from sqlalchemy import exists
 from sqlalchemy.orm import validates
 
 from . import db
-from .settings import SHORT_ID_PATTERN
+from .settings import SHORT_ID_LENGTH, SHORT_ID_PATTERN
 
 
 class MaxLength:
     ORIGINAL_URL = 256
-    SHORT_ID = 16
 
 
 class MinLength:
@@ -27,7 +26,7 @@ class Message:
                                 ' латинские буквы и цифры')
     INVALID_SHORT_ID_LENGTH = ('Длина короткой ссылки '
                                f'от {MinLength.SHORT_ID} '
-                               f'до {MaxLength.SHORT_ID}')
+                               f'до {SHORT_ID_LENGTH}')
     FILTERS_REQUIRED = 'Нужно передать хотя бы один фильтр'
     INVALID_FILTERS = 'Некорректные поля {}'
 
@@ -35,7 +34,7 @@ class Message:
 class URLMap(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     original = db.Column(db.String(MaxLength.ORIGINAL_URL), nullable=False)
-    short = db.Column(db.String(MaxLength.SHORT_ID),
+    short = db.Column(db.String(SHORT_ID_LENGTH),
                       nullable=False, unique=True)
     timestamp = db.Column(db.DateTime, index=True,
                           default=datetime.now(timezone.utc))
