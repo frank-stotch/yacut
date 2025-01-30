@@ -1,9 +1,8 @@
 from http import HTTPStatus
 
-from flask import flash, jsonify, render_template
+from flask import jsonify, render_template
 
 from . import app, db
-from .forms import URLMapForm
 
 
 class InvalidAPIUsage(Exception):
