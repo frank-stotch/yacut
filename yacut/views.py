@@ -29,4 +29,4 @@ def redirect_view(short: str):
     original = URLMap.from_short(short=short)
     if not original:
         abort(HTTPStatus.NOT_FOUND)
-    redirect(original)
+    return redirect(original)
