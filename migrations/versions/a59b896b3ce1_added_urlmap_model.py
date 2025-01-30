@@ -1,8 +1,8 @@
 """added urlmap model
 
-Revision ID: 292035687094
+Revision ID: a59b896b3ce1
 Revises: 
-Create Date: 2025-01-30 05:29:08.563438
+Create Date: 2025-01-31 00:43:09.161652
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '292035687094'
+revision = 'a59b896b3ce1'
 down_revision = None
 branch_labels = None
 depends_on = None
