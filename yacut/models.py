@@ -1,21 +1,19 @@
-import re
-from datetime import datetime, timezone
-from urllib.parse import urlparse
+from datetime import datetime
+from random import choices
 
-from sqlalchemy import exists
-from sqlalchemy.orm import validates
+from flask import url_for
 
 from . import db
-from .settings import SHORT_ID_LENGTH, SHORT_ID_PATTERN
+from .settings import (
+    MAX_GENERATE_SHORT_RETRIES,
+    MAX_SHORT_LENGTH,
+    POSSIBLE_CHARACTERS,
+    RANDOM_SHORT_LENGTH,
+    REDIRECT_VIEW
+)
 
 
-class MaxLength:
-    ORIGINAL_URL = 256
-
-
-class MinLength:
-    ORIGINAL_URL = 3
-    SHORT_ID = 1
+ORIGINAL_MAX_LENGTH = 256
 
 
 class Message:
@@ -25,83 +23,46 @@ class Message:
     INVALID_SHORT_ID_PATTERN = ('Можно использовать только'
                                 ' латинские буквы и цифры')
     INVALID_SHORT_ID_LENGTH = ('Длина короткой ссылки '
-                               f'от {MinLength.SHORT_ID} '
-                               f'до {SHORT_ID_LENGTH}')
+                               f'до {MAX_SHORT_LENGTH}')
     FILTERS_REQUIRED = 'Нужно передать хотя бы один фильтр'
     INVALID_FILTERS = 'Некорректные поля {}'
 
 
 class URLMap(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    original = db.Column(db.String(MaxLength.ORIGINAL_URL), nullable=False)
-    short = db.Column(db.String(SHORT_ID_LENGTH),
+    original = db.Column(db.String(ORIGINAL_MAX_LENGTH), nullable=False)
+    short = db.Column(db.String(MAX_SHORT_LENGTH),
                       nullable=False, unique=True)
     timestamp = db.Column(db.DateTime, index=True,
-                          default=datetime.now(timezone.utc))
-
-    @classmethod
-    def get_required_fields_names(cls):
-        return [
-            column.name for column in cls.__table__.columns
-            if not column.primary_key
-            and not column.default
-            and not column.server_default
-            and not column.nullable
-        ]
-
-    @classmethod
-    def get_all_fields_names(cls):
-        return [column.name for column in cls.__table__.columns]
-
-    def save(self):
-        if not self.id:
-            db.session.add(self)
-        db.session.commit()
-
-    def destroy(self):
-        db.session.delete(self)
-        db.session.commit()
+                          default=datetime.utcnow)
 
     def to_dict(self):
-        return {
-            field_name: getattr(self, field_name)
-            for field_name in self.get_all_fields_names()
-        }
+        return {'url': self.original, 'custom_id': self.short}
 
-    def from_dict(self, data: dict):
-        for field in self.get_required_fields_names():
-            if field in data:
-                setattr(self, field, data[field])
+    @staticmethod
+    def create(original, short):
+        db.session.add(URLMap(original=original, short=short))
+        db.session.commit()
 
-    @classmethod
-    def __check_filters(cls, **filters):
-        if not filters:
-            raise ValueError(Message.FILTERS_REQUIRED)
-        invalid_keys = set(filters) - set(cls.get_all_fields_names())
-        if invalid_keys:
-            raise ValueError(Message.INVALID_FILTERS.format(invalid_keys))
+    @staticmethod
+    def from_short(short):
+        entry = URLMap.query.filter_by(short=short).first()
+        if entry:
+            return entry.original
 
-    @classmethod
-    def exists(cls, **filters):
-        cls.__check_filters(**filters)
-        return bool(
-            db.session.query(
-                exists().where(
-                    *[getattr(cls, key) == value
-                      for key, value in filters.items()]
-                )
-            ).scalar()
-        )
+    @staticmethod
+    def generate_short():
+        retry = 1
+        while retry <= MAX_GENERATE_SHORT_RETRIES:
+            short = ''.join(
+                choices(POSSIBLE_CHARACTERS, k=RANDOM_SHORT_LENGTH)
+            )
+            if not URLMap.query.filter_by(short=short).first():
+                return short
+            retry += 1
 
-    @validates('original')
-    def validate_original(self, key, original: str):
-        parsed = urlparse(original)
-        if not all([parsed.scheme, parsed.netloc]):
-            raise ValueError(Message.INVALID_URL_PATTERN)
-        return original
-
-    @validates('short')
-    def validate_short(self, key, short: str):
-        if not re.fullmatch(SHORT_ID_PATTERN, short):
-            raise ValueError(Message.INVALID_SHORT_ID_PATTERN)
-        return short
+    @staticmethod
+    def get_url_for_short(short):
+        entry = URLMap.query.filter_by(short=short).first()
+        if entry:
+            return url_for(REDIRECT_VIEW, short=short, _external=True)
