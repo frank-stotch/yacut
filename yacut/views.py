@@ -19,7 +19,7 @@ def index_view():
         return render_template('index.html',
                                form=form,
                                short=URLMap.get_url_for_short(entry.short))
-    except ValueError as e:
+    except ValueError or RuntimeError as e:
         flash(str(e))
         return render_template('index.html', form=form)
 

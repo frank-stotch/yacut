@@ -82,7 +82,7 @@ class URLMap(db.Model):
             )
             if not URLMap.query.filter_by(short=short).first():
                 return short
-        raise ValueError(Message.GENERATION_FAILED)
+        raise RuntimeError(Message.GENERATION_FAILED)
 
     @staticmethod
     def get_url_for_short(short: str) -> Union[str, None]:
