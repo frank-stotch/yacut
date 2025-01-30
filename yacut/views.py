@@ -7,9 +7,6 @@ from .forms import URLMapForm
 from .models import URLMap
 
 
-SHORT_ID_READY = ('Ваша короткая ссылка готова:')
-
-
 @app.route('/', methods=['GET', 'POST'])
 def index_view():
     form = URLMapForm()
