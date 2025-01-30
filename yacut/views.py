@@ -12,8 +12,7 @@ from .models import URLMap
 POSSIBLE_CHARACTERS = ascii_letters + digits
 SHORT_ID_READY = ('Ваша короткая ссылка готова: '
                   '<a href="{short}">{short}</a>')
-SHORT_ALREADY_EXISTS = ('Вариант короткой ссылки '
-                        '<a href="{short}">{short}</a> уже существует')
+SHORT_ALREADY_EXISTS = 'Предложенный вариант короткой ссылки уже существует.'
 RANDOM_SHORT_ID_LENGTH = 6
 
 
@@ -29,13 +28,13 @@ def get_unique_short_id():
 
 
 def get_unique_short_id_or_400(custom_short_id=None):
-    if custom_short_id:
-        if URLMap.exists(short=custom_short_id):
-            short_url = url_for(
-                'redirect_view', short_id=custom_short_id, _external=True)
-            raise BadRequest(SHORT_ALREADY_EXISTS.format(short=short_url))
-        return custom_short_id
-    return get_unique_short_id()
+    if not custom_short_id:
+        return get_unique_short_id()
+    if URLMap.exists(short=custom_short_id):
+        short_url = url_for(
+            'redirect_view', short_id=custom_short_id, _external=True)
+        raise BadRequest(SHORT_ALREADY_EXISTS.format(short=short_url))
+    return custom_short_id
 
 
 @app.route('/', methods=['GET', 'POST'])
