@@ -22,7 +22,6 @@ ORIGINAL_MAX_LENGTH = 256
 
 class Message:
     REQUIRED_FIELD = 'Обязательное поле'
-    SHORT_ALREADY_EXISTS = 'Вариант короткой ссылки "{}" уже существует'
     INVALID_URL_PATTERN = 'Неправильный формат ссылки'
     INVALID_SHORT_PATTERN = ('Можно использовать только'
                              ' латинские буквы и цифры')
@@ -69,9 +68,10 @@ class URLMap(db.Model):
     @staticmethod
     def get_or_generate_short(short: Union[str, None] = None):
         if short:
-            if len(short) > MAX_SHORT_LENGTH:
-                raise ValueError(Message.INVALID_SHORT_LENGTH)
-            if not re.fullmatch(SHORT_PATTERN, short):
+            if (
+                len(short) > MAX_SHORT_LENGTH
+                or not re.fullmatch(SHORT_PATTERN, short)
+            ):
                 raise ValueError(Message.INVALID_SHORT)
             if not URLMap.query.filter_by(short=short).first():
                 return short
