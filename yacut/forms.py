@@ -2,8 +2,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, URLField
 from wtforms.validators import DataRequired, Length, Optional, Regexp, URL
 
-from .models import Message, MinLength
-from .settings import SHORT_ID_LENGTH, SHORT_ID_PATTERN
+from .models import Message, ORIGINAL_MAX_LENGTH
+from .settings import MAX_SHORT_LENGTH, SHORT_PATTERN
 
 
 class Label:
@@ -17,16 +17,18 @@ class URLMapForm(FlaskForm):
         label=Label.LONG_URL,
         validators=[
             DataRequired(Message.REQUIRED_FIELD),
-            URL(message=Message.INVALID_URL_PATTERN)
+            URL(message=Message.INVALID_URL_PATTERN),
+            Length(max=ORIGINAL_MAX_LENGTH,
+                   message=Message.INVALID_ORIGINAL_LENGTH)
         ]
     )
     custom_id = StringField(
         label=Label.CUSTOM_SHORT_ID,
         validators=[
             Optional(),
-            Regexp(SHORT_ID_PATTERN, message=Message.INVALID_SHORT_ID_PATTERN),
-            Length(MinLength.SHORT_ID, SHORT_ID_LENGTH,
-                   Message.INVALID_SHORT_ID_LENGTH)
+            Regexp(SHORT_PATTERN, message=Message.INVALID_SHORT_PATTERN),
+            Length(max=MAX_SHORT_LENGTH,
+                   message=Message.INVALID_SHORT_LENGTH)
         ]
     )
     submit = SubmitField(label=Label.SUBMIT)
