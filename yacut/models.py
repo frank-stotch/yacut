@@ -11,7 +11,7 @@ from .settings import SHORT_ID_PATTERN
 
 class MaxLength:
     ORIGINAL_URL = 256
-    SHORT_ID = 64
+    SHORT_ID = 16
 
 
 class MinLength:
