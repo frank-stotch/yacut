@@ -45,14 +45,14 @@ flask db upgrade
 flask run
 ```
 
-Документация лежит в файле openapi.yml, который удобно читать в онлайн-редакторе [Swagger](https://editor.swagger.io/)
+Документация лежит в файле openapi.yml, который удобно читать в онлайн-редакторе [Swagger](https://editor.swagger.io/?url=https://raw.githubusercontent.com/frank-stotch/yacut/refs/heads/master/openapi.yml?token=GHSAT0AAAAAAC5ME6BNVMDGM3AMLOYDHNOAZ45GYAA)
 
 Техностек:
-* Python 3.9
-* Flask 3.0
-* Flask-Migrate 4.0
-* Flask-SQLAlchemy 3.1
-* Flask-WTF 1.2
-* SQLAlchemy 2.0
+* Python
+* Flask
+* Flask-Migrate
+* Flask-SQLAlchemy
+* Flask-WTF
+* SQLAlchemy
 
 Автор: Иван Курилов [Frank_Stotch](https://github.com/frank-stotch)
