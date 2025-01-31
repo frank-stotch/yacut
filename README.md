@@ -45,7 +45,7 @@ flask db upgrade
 flask run
 ```
 
-Документация лежит в файле openapi.yml, который удобно читать в онлайн-редакторе [Swagger](https://editor.swagger.io/?url=https://raw.githubusercontent.com/frank-stotch/yacut/refs/heads/master/openapi.yml?token=GHSAT0AAAAAAC5ME6BNVMDGM3AMLOYDHNOAZ45GYAA)
+Документация лежит в файле openapi.yml, который удобно читать в онлайн-редакторе [Swagger](https://editor.swagger.io/?url=https://raw.githubusercontent.com/frank-stotch/yacut/refs/heads/master/openapi.yml)
 
 Техностек:
 * Python
