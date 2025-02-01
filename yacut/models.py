@@ -30,23 +30,21 @@ class URLMap(db.Model):
     timestamp = db.Column(db.DateTime, index=True,
                           default=datetime.utcnow)
 
-    def to_dict(self):
-        return {'url': self.original, 'custom_id': self.short}
-
     @staticmethod
     def create(
         original: str,
         short: Union[str, None] = None,
         full_validation=True
     ):
-        if short and full_validation:
-            if len(short) > MAX_SHORT_LENGTH:
-                raise ValueError(INVALID_SHORT)
-            if not re.fullmatch(SHORT_PATTERN, short):
-                raise ValueError(INVALID_SHORT)
+        if short:
+            if full_validation:
+                if len(short) > MAX_SHORT_LENGTH:
+                    raise ValueError(INVALID_SHORT)
+                if not re.fullmatch(SHORT_PATTERN, short):
+                    raise ValueError(INVALID_SHORT)
             if URLMap.get(short):
-                raise ValueError(SHORT_ALREADY_EXISTS.format(short))
-        else:
+                raise ValueError(SHORT_ALREADY_EXISTS)
+        if not short:
             short = URLMap.generate_short()
         if len(original) > ORIGINAL_MAX_LENGTH:
             raise ValueError(INVALID_ORIGINAL)
