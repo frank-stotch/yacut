@@ -2,9 +2,6 @@ import re
 from datetime import datetime
 from random import choices
 from typing import Union
-from urllib.parse import urlparse
-
-from flask import url_for
 
 from . import db
 from .settings import (
@@ -13,7 +10,6 @@ from .settings import (
     ORIGINAL_MAX_LENGTH,
     POSSIBLE_CHARACTERS,
     RANDOM_SHORT_LENGTH,
-    REDIRECT_VIEW,
     SHORT_PATTERN
 )
 
