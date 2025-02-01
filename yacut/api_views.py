@@ -1,13 +1,14 @@
 from http import HTTPStatus
 
-from flask import jsonify, request
+from flask import jsonify, request, url_for
 
 from . import app
 from .error_handlers import InvalidAPIUsage
 from .models import URLMap
+from .settings import REDIRECT_VIEW
 
 
-ID_NOT_EXIST = 'Указанный id не найден'
+ID_DOES_NOT_EXIST = 'Указанный id не найден'
 NO_REQUEST_BODY = 'Отсутствует тело запроса'
 ORIGINAL_MISSING = '"url" является обязательным полем!'
 
@@ -16,7 +17,7 @@ ORIGINAL_MISSING = '"url" является обязательным полем!'
 def get_url(short):
     entry = URLMap.get(short)
     if not entry:
-        raise InvalidAPIUsage(ID_NOT_EXIST, HTTPStatus.NOT_FOUND)
+        raise InvalidAPIUsage(ID_DOES_NOT_EXIST, HTTPStatus.NOT_FOUND)
     return jsonify({'url': entry.original}), HTTPStatus.OK
 
 
@@ -28,8 +29,13 @@ def create_id():
     if 'url' not in data:
         raise InvalidAPIUsage(ORIGINAL_MISSING)
     try:
-        entry = URLMap.create(data.get('url'), data.get('custom_id'))
-        return jsonify(entry.to_dict()), HTTPStatus.CREATED
+        entry = URLMap.create(data['url'], data.get('custom_id'))
+        return jsonify(
+            {"url": entry.original,
+             "short_link": url_for(REDIRECT_VIEW,
+                                   short=entry.short,
+                                   _external=True)}
+        ), HTTPStatus.CREATED
     except ValueError as e:
         raise InvalidAPIUsage(str(e))
     except RuntimeError as e:
