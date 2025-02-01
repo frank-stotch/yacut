@@ -44,7 +44,7 @@ class URLMap(db.Model):
                 raise ValueError(INVALID_SHORT)
             if not re.fullmatch(SHORT_PATTERN, short):
                 raise ValueError(INVALID_SHORT)
-            if URLMap.get_from_short(short):
+            if URLMap.get(short):
                 raise ValueError(SHORT_ALREADY_EXISTS.format(short))
         else:
             short = URLMap.generate_short()
@@ -56,7 +56,7 @@ class URLMap(db.Model):
         return entry
 
     @staticmethod
-    def get_from_short(short: str) -> Union[str, None]:
+    def get(short: str):
         return URLMap.query.filter_by(short=short).first()
 
     @staticmethod
@@ -65,6 +65,6 @@ class URLMap(db.Model):
             short = ''.join(
                 choices(POSSIBLE_CHARACTERS, k=RANDOM_SHORT_LENGTH)
             )
-            if not URLMap.get_from_short(short):
+            if not URLMap.get(short):
                 return short
         raise RuntimeError(GENERATION_FAILED)
