@@ -29,12 +29,11 @@ def create_id():
     if 'url' not in data:
         raise InvalidAPIUsage(ORIGINAL_MISSING)
     try:
-        entry = URLMap.create(data['url'], data.get('custom_id'))
         return jsonify(
-            {"url": entry.original,
-             "short_link": url_for(REDIRECT_VIEW,
-                                   short=entry.short,
-                                   _external=True)}
+            {'url': data['url'],
+             'short_link': URLMap.build_short_url(
+                 URLMap.create(data['url'],
+                               data.get('custom_id')).short)}
         ), HTTPStatus.CREATED
     except ValueError as e:
         raise InvalidAPIUsage(str(e))

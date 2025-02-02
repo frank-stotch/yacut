@@ -3,8 +3,8 @@ import re
 from string import ascii_letters, digits
 
 
-POSSIBLE_CHARACTERS = re.escape(ascii_letters + digits)
-SHORT_PATTERN = rf'^[{POSSIBLE_CHARACTERS}]+$'
+POSSIBLE_CHARACTERS = ascii_letters + digits
+SHORT_PATTERN = rf'^[{re.escape(POSSIBLE_CHARACTERS)}]+$'
 MAX_SHORT_LENGTH = 16
 
 RANDOM_SHORT_LENGTH = 6

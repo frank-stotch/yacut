@@ -13,13 +13,15 @@ def index_view():
     if not form.validate_on_submit():
         return render_template('index.html', form=form)
     try:
-        entry = URLMap.create(original=form.original_link.data,
-                              short=form.custom_id.data,
-                              full_validation=False)
         return render_template(
             'index.html',
             form=form,
-            short=entry.short
+            short_url=URLMap.build_short_url(
+                URLMap.create(original=form.original_link.data,
+                              short=form.custom_id.data,
+                              full_validation=False
+                              ).short
+            )
         )
     except (ValueError, RuntimeError) as e:
         flash(str(e))
