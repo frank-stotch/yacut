@@ -1,11 +1,10 @@
 from http import HTTPStatus
 
-from flask import jsonify, request, url_for
+from flask import jsonify, request
 
 from . import app
 from .error_handlers import InvalidAPIUsage
 from .models import URLMap
-from .settings import REDIRECT_VIEW
 
 
 ID_DOES_NOT_EXIST = 'Указанный id не найден'
