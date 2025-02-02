@@ -3,6 +3,8 @@ from datetime import datetime
 from random import choices
 from typing import Union
 
+from flask import url_for
+
 from . import db
 from .settings import (
     MAX_GENERATE_SHORT_RETRIES,
@@ -10,6 +12,7 @@ from .settings import (
     ORIGINAL_MAX_LENGTH,
     POSSIBLE_CHARACTERS,
     RANDOM_SHORT_LENGTH,
+    REDIRECT_VIEW,
     SHORT_PATTERN
 )
 
@@ -44,9 +47,9 @@ class URLMap(db.Model):
                     raise ValueError(INVALID_SHORT)
             if URLMap.get(short):
                 raise ValueError(SHORT_ALREADY_EXISTS)
-        if not short:
+        else:
             short = URLMap.generate_short()
-        if len(original) > ORIGINAL_MAX_LENGTH:
+        if full_validation and len(original) > ORIGINAL_MAX_LENGTH:
             raise ValueError(INVALID_ORIGINAL)
         entry = URLMap(original=original, short=short)
         db.session.add(entry)
@@ -66,3 +69,7 @@ class URLMap(db.Model):
             if not URLMap.get(short):
                 return short
         raise RuntimeError(GENERATION_FAILED)
+
+    @staticmethod
+    def build_short_url(short: str):
+        return url_for(REDIRECT_VIEW, short=short, _external=True)
